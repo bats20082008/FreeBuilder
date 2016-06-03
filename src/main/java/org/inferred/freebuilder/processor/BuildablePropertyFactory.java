@@ -43,6 +43,7 @@ import javax.lang.model.util.Types;
 
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
+import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.SourceBuilder;
 
@@ -290,17 +291,7 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public boolean isTemplateRequiredInClear() {
-      return false;
-    }
-
-    @Override
-    public void addClear(SourceBuilder code, String template) {
-      code.addLine("%s.clear();", property.getName());
-    }
-
-    @Override
-    public void addPartialClear(SourceBuilder code) {
+    public void addClear(SourceBuilder code, Optional<Excerpt> template) {
       code.addLine("%s.clear();", property.getName());
     }
   }
