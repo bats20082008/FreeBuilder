@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableSet;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
 import org.inferred.freebuilder.processor.excerpt.CheckedList;
+import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.QualifiedName;
 import org.inferred.freebuilder.processor.util.SourceBuilder;
@@ -294,17 +295,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public boolean isTemplateRequiredInClear() {
-      return false;
-    }
-
-    @Override
-    public void addClear(SourceBuilder code, String template) {
-      code.addLine("%s.clear();", property.getName());
-    }
-
-    @Override
-    public void addPartialClear(SourceBuilder code) {
+    public void addClear(SourceBuilder code, Optional<Excerpt> template) {
       code.addLine("%s.clear();", property.getName());
     }
 

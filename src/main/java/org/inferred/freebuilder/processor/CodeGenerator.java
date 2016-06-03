@@ -23,13 +23,13 @@ import static org.inferred.freebuilder.processor.BuilderFactory.TypeInference.EX
 import static org.inferred.freebuilder.processor.Metadata.GET_CODE_GENERATOR;
 import static org.inferred.freebuilder.processor.Metadata.UnderrideLevel.ABSENT;
 import static org.inferred.freebuilder.processor.Metadata.UnderrideLevel.FINAL;
-import static org.inferred.freebuilder.processor.PropertyCodeGenerator.IS_TEMPLATE_REQUIRED_IN_CLEAR;
 import static org.inferred.freebuilder.processor.util.feature.GuavaLibrary.GUAVA;
 import static org.inferred.freebuilder.processor.util.feature.SourceLevel.SOURCE_LEVEL;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -40,6 +40,7 @@ import org.inferred.freebuilder.processor.BuilderFactory.TypeInference;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Type;
+import org.inferred.freebuilder.processor.util.Block;
 import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.PreconditionExcerpts;
 import org.inferred.freebuilder.processor.util.SourceBuilder;
@@ -226,20 +227,17 @@ public class CodeGenerator {
           .addLine(" * Resets the state of this builder.")
           .addLine(" */")
           .addLine("public %s clear() {", metadata.getBuilder());
+      Block body = new Block(code);
       List<PropertyCodeGenerator> codeGenerators =
           Lists.transform(metadata.getProperties(), GET_CODE_GENERATOR);
-      if (Iterables.any(codeGenerators, IS_TEMPLATE_REQUIRED_IN_CLEAR)) {
-        code.addLine("  %s _template = %s;",
+      Excerpt template = body.variable("_template", "  %s _template = %s;",
             metadata.getGeneratedBuilder(),
-            metadata.getBuilderFactory().get().newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
-      }
+            metadata.getBuilderFactory().get()
+                .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
       for (PropertyCodeGenerator codeGenerator : codeGenerators) {
-        if (codeGenerator.isTemplateRequiredInClear()) {
-          codeGenerator.addClear(code, "_template");
-        } else {
-          codeGenerator.addClear(code, null);
-        }
+        codeGenerator.addClear(body, Optional.of(template));
       }
+      code.add(body);
       if (any(metadata.getProperties(), IS_REQUIRED)) {
         code.addLine("  _unsetProperties.clear();")
             .addLine("  _unsetProperties.addAll(_template._unsetProperties);",
@@ -257,7 +255,7 @@ public class CodeGenerator {
           .addLine(" */")
           .addLine("public %s clear() {", metadata.getBuilder());
       for (Property property : metadata.getProperties()) {
-        property.getCodeGenerator().addPartialClear(code);
+        property.getCodeGenerator().addClear(code, Optional.<Excerpt>absent());
       }
       code.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
