@@ -276,12 +276,12 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromValue(SourceBuilder code, String value) {
+    public void addMergeFromValue(SourceBuilder code, Metadata metadata, String value, Optional<Excerpt> emptyTemplate) {
       code.addLine("%s(%s.%s());", addAllMethod(property), value, property.getGetterName());
     }
 
     @Override
-    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder) {
+    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder, Excerpt unsetProperties, Optional<Excerpt> emptyTemplate) {
       code.addLine("%s(((%s) %s).%s);",
           addAllMethod(property),
           metadata.getGeneratedBuilder(),

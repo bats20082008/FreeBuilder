@@ -172,13 +172,63 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromValue(SourceBuilder code, String value) {
-      code.addLine("%s(%s.%s());", setter(property), value, property.getGetterName());
+    public void addMergeFromValue(
+        SourceBuilder code, Metadata metadata, String value, Optional<Excerpt> emptyTemplate) {
+      if (emptyTemplate.isPresent()) {
+        code.add("if (");
+        if (!hasDefault) {
+          code.add("%s._unsetProperties.contains(%s.%s) || ",
+              emptyTemplate.get(), metadata.getPropertyEnum(), property.getAllCapsName());
+        }
+        if (isPrimitive) {
+          code.add("%1$s.%2$s() != %3$s.%2$s()) {%n",
+              value, property.getGetterName(), emptyTemplate.get());
+        } else {
+          code.add("!%1$s.%2$s().equals(%3$s.%2$s())) {%n",
+              value, property.getGetterName(), emptyTemplate.get());
+        }
+      }
+      code.addLine("  %s(%s.%s());", setter(property), value, property.getGetterName());
+      if (emptyTemplate.isPresent()) {
+        code.addLine("}");
+      }
     }
 
     @Override
-    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder) {
-      code.addLine("%s(%s.%s());", setter(property), builder, getter(property));
+    public void addMergeFromBuilder(
+        SourceBuilder code,
+        Metadata metadata,
+        String builder,
+        Excerpt builderUnset,
+        Optional<Excerpt> emptyTemplate) {
+      if (emptyTemplate.isPresent()) {
+        code.add("if (");
+        if (!hasDefault) {
+          code.add("!%1$s.contains(%2$s.%3$s) && (%4$s._unsetProperties.contains(%2$s.%3$s) || ",
+              builderUnset,
+              metadata.getPropertyEnum(),
+              property.getAllCapsName(),
+              emptyTemplate.get());
+        }
+        if (isPrimitive) {
+          code.add("%1$s.%2$s() != %3$s.%2$s()",
+              builder, getter(property), emptyTemplate.get());
+        } else {
+          code.add("!%1$s.%2$s().equals(%3$s.%2$s())",
+              builder, getter(property), emptyTemplate.get());
+        }
+        if (!hasDefault) {
+          code.add(")");
+        }
+        code.add(") {\n");
+      } else if (!hasDefault) {
+          code.addLine("if (!%s.contains(%s.%s)) {",
+              builderUnset, metadata.getPropertyEnum(), property.getAllCapsName());
+      }
+      code.addLine("  %s(%s.%s());", setter(property), builder, getter(property));
+      if (!hasDefault || emptyTemplate.isPresent()) {
+        code.addLine("}");
+      }
     }
 
     @Override

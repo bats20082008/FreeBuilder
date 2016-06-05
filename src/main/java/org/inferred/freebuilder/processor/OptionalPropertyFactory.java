@@ -320,13 +320,13 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromValue(SourceBuilder code, String value) {
+    public void addMergeFromValue(SourceBuilder code, Metadata metadata, String value, Optional<Excerpt> emptyTemplate) {
       String propertyValue = value + "." + property.getGetterName() + "()";
       optional.invokeIfPresent(code, propertyValue, setter(property));
     }
 
     @Override
-    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder) {
+    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder, Excerpt unsetProperties, Optional<Excerpt> emptyTemplate) {
       String propertyValue = builder + "." + getter(property) + "()";
       optional.invokeIfPresent(code, propertyValue, setter(property));
     }
@@ -348,7 +348,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addClear(SourceBuilder code, Optional<Excerpt> template) {
       if (template.isPresent()) {
-        code.addLine("%1$s = %2$s.%1$s;", property.getName(), template);
+        code.addLine("%1$s = %2$s.%1$s;", property.getName(), template.get());
       } else {
         code.addLine("%s = null;", property.getName());
       }

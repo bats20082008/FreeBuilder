@@ -180,11 +180,14 @@ public class CodeGenerator {
             metadata.getType().getQualifiedName())
         .addLine(" */")
         .addLine("public %s mergeFrom(%s value) {", metadata.getBuilder(), metadata.getType());
+    Block body = new Block(code);
+    Optional<Excerpt> emptyTemplate = freshBuilderVariable(body, metadata, "_emptyTemplate");
     for (Property property : metadata.getProperties()) {
-      property.getCodeGenerator().addMergeFromValue(code, "value");
+      property.getCodeGenerator().addMergeFromValue(body, metadata, "value", emptyTemplate);
     }
-    code.add("  return (%s) this;\n", metadata.getBuilder());
-    code.addLine("}");
+    code.add(body)
+        .addLine("  return (%s) this;", metadata.getBuilder())
+        .addLine("}");
   }
 
   private static void addMergeFromBuilderMethod(SourceBuilder code, Metadata metadata) {
@@ -198,42 +201,36 @@ public class CodeGenerator {
     }
     code.addLine(" */")
         .addLine("public %1$s mergeFrom(%1$s template) {", metadata.getBuilder());
-    if (hasRequiredProperties) {
-      code.addLine("  // Upcast to access the private _unsetProperties field.")
-          .addLine("  // Otherwise, oddly, we get an access violation.")
-          .addLine("  %s<%s> _templateUnset = ((%s) template)._unsetProperties;",
-              EnumSet.class,
-              metadata.getPropertyEnum(),
-              metadata.getGeneratedBuilder());
-    }
+    Block body = new Block(code);
+    Optional<Excerpt> emptyTemplate = freshBuilderVariable(body, metadata, "_emptyTemplate");
+    Excerpt unsetProperties = body.variable(
+        "_templateUnset",
+        "  // Upcast to access the private _unsetProperties field.%n"
+            + "  // Otherwise, oddly, we get an access violation.%n"
+            + "  %s<%s> _templateUnset = ((%s) template)._unsetProperties;",
+        EnumSet.class,
+        metadata.getPropertyEnum(),
+        metadata.getGeneratedBuilder());
     for (Property property : metadata.getProperties()) {
-      if (property.getCodeGenerator().getType() == Type.REQUIRED) {
-        code.addLine("  if (!_templateUnset.contains(%s.%s)) {",
-            metadata.getPropertyEnum(), property.getAllCapsName());
-        property.getCodeGenerator().addMergeFromBuilder(code, metadata, "template");
-        code.addLine("  }");
-      } else {
-        property.getCodeGenerator().addMergeFromBuilder(code, metadata, "template");
-      }
+      property.getCodeGenerator()
+          .addMergeFromBuilder(body, metadata, "template", unsetProperties, emptyTemplate);
     }
-    code.addLine("  return (%s) this;", metadata.getBuilder());
-    code.addLine("}");
+    code.add(body)
+        .addLine("  return (%s) this;", metadata.getBuilder())
+        .addLine("}");
   }
 
   private static void addClearMethod(SourceBuilder code, Metadata metadata) {
-    if (metadata.getBuilderFactory().isPresent()) {
+    Block body = new Block(code);
+    Excerpt template = freshBuilderVariable(body, metadata, "_template").orNull();
+    if (template != null) {
       code.addLine("")
           .addLine("/**")
           .addLine(" * Resets the state of this builder.")
           .addLine(" */")
           .addLine("public %s clear() {", metadata.getBuilder());
-      Block body = new Block(code);
       List<PropertyCodeGenerator> codeGenerators =
           Lists.transform(metadata.getProperties(), GET_CODE_GENERATOR);
-      Excerpt template = body.variable("_template", "  %s _template = %s;",
-            metadata.getGeneratedBuilder(),
-            metadata.getBuilderFactory().get()
-                .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
       for (PropertyCodeGenerator codeGenerator : codeGenerators) {
         codeGenerator.addClear(body, Optional.of(template));
       }
@@ -259,6 +256,19 @@ public class CodeGenerator {
       }
       code.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
+    }
+  }
+
+  private static Optional<Excerpt> freshBuilderVariable(
+      Block body, Metadata metadata, String name) {
+    if (metadata.getBuilderFactory().isPresent()) {
+      return Optional.of(body.variable(name, "%s %s = %s;",
+            metadata.getGeneratedBuilder(),
+            name,
+            metadata.getBuilderFactory().get()
+                .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES)));
+    } else {
+      return Optional.absent();
     }
   }
 

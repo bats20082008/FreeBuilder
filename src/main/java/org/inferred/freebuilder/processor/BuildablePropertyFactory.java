@@ -30,6 +30,18 @@ import static org.inferred.freebuilder.processor.util.feature.FunctionPackage.FU
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.util.ElementFilter.typesIn;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+
+import org.inferred.freebuilder.processor.Metadata.Property;
+import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
+import org.inferred.freebuilder.processor.util.Excerpt;
+import org.inferred.freebuilder.processor.util.ParameterizedType;
+import org.inferred.freebuilder.processor.util.SourceBuilder;
+
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -40,18 +52,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-
-import org.inferred.freebuilder.processor.Metadata.Property;
-import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
-import org.inferred.freebuilder.processor.util.Excerpt;
-import org.inferred.freebuilder.processor.util.ParameterizedType;
-import org.inferred.freebuilder.processor.util.SourceBuilder;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 /**
  * {@link PropertyCodeGenerator.Factory} for <b>buildable</b> types: that is, types with a Builder
@@ -264,7 +264,7 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromValue(SourceBuilder code, String value) {
+    public void addMergeFromValue(SourceBuilder code, Metadata metadata, String value, Optional<Excerpt> emptyTemplate) {
       String propertyName = property.getName();
       if (propertyName.equals(value)) {
         propertyName = "this." + propertyName;  // see issue #78
@@ -273,7 +273,7 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder) {
+    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder, Excerpt unsetProperties, Optional<Excerpt> emptyTemplate) {
       String propertyName = property.getName();
       if (propertyName.equals(builder)) {
         propertyName = "this." + propertyName;  // see issue #78

@@ -110,11 +110,18 @@ public abstract class PropertyCodeGenerator {
     addFinalFieldAssignment(code, finalField, builder);
   }
 
-  /** Add a merge from value for the property to the builder's source code. */
-  public abstract void addMergeFromValue(SourceBuilder code, String value);
+  /** Add a merge from value for the property to the builder's source code. 
+   * @param metadata TODO*/
+  public abstract void addMergeFromValue(
+      SourceBuilder code, Metadata metadata, String value, Optional<Excerpt> emptyTemplate);
 
   /** Add a merge from builder for the property to the builder's source code. */
-  public abstract void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder);
+  public abstract void addMergeFromBuilder(
+      SourceBuilder code,
+      Metadata metadata,
+      String builder,
+      Excerpt unsetProperties,
+      Optional<Excerpt> emptyTemplate);
 
   /** Adds method annotations for the value type getter method. */
   public void addGetterAnnotations(@SuppressWarnings("unused") SourceBuilder code) {}

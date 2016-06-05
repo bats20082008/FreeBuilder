@@ -19,6 +19,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import static org.inferred.freebuilder.processor.util.AnnotationSource.addSource;
 
+import com.google.common.base.Optional;
+
 import org.inferred.freebuilder.processor.util.feature.Feature;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.feature.FeatureType;
@@ -120,6 +122,8 @@ public final class SourceStringBuilder implements SourceBuilder {
       SourceBuilder excerptBuilder = subBuilder();
       addSource(excerptBuilder, (AnnotationMirror) arg);
       return excerptBuilder.toString();
+    } else if (arg instanceof Optional) {
+      throw new IllegalArgumentException("Cannot write Optional arguments to source");
     } else {
       return arg;
     }
