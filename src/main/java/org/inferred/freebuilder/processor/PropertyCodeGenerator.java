@@ -114,7 +114,8 @@ public abstract class PropertyCodeGenerator {
   public abstract void addMergeFromValue(SourceBuilder code, String value);
 
   /** Add a merge from builder for the property to the builder's source code. */
-  public abstract void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder);
+  public abstract void addMergeFromBuilder(
+      SourceBuilder code, Metadata metadata, String builder, Excerpt base);
 
   /** Adds method annotations for the value type getter method. */
   public void addGetterAnnotations(@SuppressWarnings("unused") SourceBuilder code) {}

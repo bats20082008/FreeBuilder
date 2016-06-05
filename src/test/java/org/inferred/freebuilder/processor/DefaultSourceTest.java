@@ -25,13 +25,12 @@ import static org.inferred.freebuilder.processor.util.feature.SourceLevel.JAVA_7
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.googlejavaformat.java.Formatter;
-import com.google.googlejavaformat.java.FormatterException;
 
 import org.inferred.freebuilder.processor.GenericTypeElementImpl.GenericTypeMirrorImpl;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.OptionalPropertyFactory.OptionalType;
 import org.inferred.freebuilder.processor.util.ClassTypeImpl;
+import org.inferred.freebuilder.processor.util.CompilationUnitBuilder;
 import org.inferred.freebuilder.processor.util.QualifiedName;
 import org.inferred.freebuilder.processor.util.SourceBuilder;
 import org.inferred.freebuilder.processor.util.SourceStringBuilder;
@@ -150,14 +149,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = "
-            + "((Person_Builder) template)._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder) this;",
@@ -906,14 +904,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder<A, B> mergeFrom(Person.Builder<A, B> template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset =",
-        "        ((Person_Builder<A, B>) template)._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder<A, B> base = (Person_Builder<A, B>) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder<A, B>) this;",
@@ -1165,14 +1162,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = ((Person_Builder) template)"
-            + "._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder) this;",
@@ -1890,14 +1886,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder<A, B> mergeFrom(Person.Builder<A, B> template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset =",
-        "        ((Person_Builder<A, B>) template)._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder<A, B> base = (Person_Builder<A, B>) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder<A, B>) this;",
@@ -2141,14 +2136,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = ((Person_Builder) template)"
-            + "._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder) this;",
@@ -2404,14 +2398,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = ((Person_Builder) template)"
-            + "._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder) this;",
@@ -2935,15 +2928,14 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = ((Person_Builder) template)"
-            + "._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
         "    setAge(template.getAge());",
-        "    if (!_templateUnset.contains(Person_Builder.Property.SHOE_SIZE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.SHOE_SIZE)) {",
         "      setShoeSize(template.getShoeSize());",
         "    }",
         "    return (Person.Builder) this;",
@@ -3252,14 +3244,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder mergeFrom(Person.Builder template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset = ((Person_Builder) template)"
-            + "._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder) this;",
@@ -4717,14 +4708,13 @@ public class DefaultSourceTest {
         "   * Does not affect any properties not set on the input.",
         "   */",
         "  public Person.Builder<A, B> mergeFrom(Person.Builder<A, B> template) {",
-        "    // Upcast to access the private _unsetProperties field.",
+        "    // Upcast to access private fields.",
         "    // Otherwise, oddly, we get an access violation.",
-        "    EnumSet<Person_Builder.Property> _templateUnset =",
-        "        ((Person_Builder<A, B>) template)._unsetProperties;",
-        "    if (!_templateUnset.contains(Person_Builder.Property.NAME)) {",
+        "    Person_Builder<A, B> base = (Person_Builder<A, B>) template;",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)) {",
         "      setName(template.getName());",
         "    }",
-        "    if (!_templateUnset.contains(Person_Builder.Property.AGE)) {",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)) {",
         "      setAge(template.getAge());",
         "    }",
         "    return (Person.Builder<A, B>) this;",
@@ -4866,11 +4856,7 @@ public class DefaultSourceTest {
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
     new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
-    try {
-      return new Formatter().formatSource(sourceBuilder.toString());
-    } catch (FormatterException e) {
-      throw new RuntimeException(e);
-    }
+    return CompilationUnitBuilder.formatSource(sourceBuilder.toString());
   }
 
   private static Metadata createMetadataWithRequiredProperties() {

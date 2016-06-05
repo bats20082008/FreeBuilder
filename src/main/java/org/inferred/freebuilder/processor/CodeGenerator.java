@@ -198,26 +198,26 @@ public class CodeGenerator {
     }
     code.addLine(" */")
         .addLine("public %1$s mergeFrom(%1$s template) {", metadata.getBuilder());
-    if (hasRequiredProperties) {
-      code.addLine("  // Upcast to access the private _unsetProperties field.")
-          .addLine("  // Otherwise, oddly, we get an access violation.")
-          .addLine("  %s<%s> _templateUnset = ((%s) template)._unsetProperties;",
-              EnumSet.class,
-              metadata.getPropertyEnum(),
-              metadata.getGeneratedBuilder());
-    }
+    Block body = new Block(code);
+    Excerpt base = body.variable(
+        "base",
+        "  // Upcast to access private fields.%n"
+            + "  // Otherwise, oddly, we get an access violation.%n"
+            + "  %1$s base = (%1$s) template;",
+        metadata.getGeneratedBuilder());
     for (Property property : metadata.getProperties()) {
       if (property.getCodeGenerator().getType() == Type.REQUIRED) {
-        code.addLine("  if (!_templateUnset.contains(%s.%s)) {",
-            metadata.getPropertyEnum(), property.getAllCapsName());
-        property.getCodeGenerator().addMergeFromBuilder(code, metadata, "template");
-        code.addLine("  }");
+        body.addLine("  if (!%s._unsetProperties.contains(%s.%s)) {",
+            base, metadata.getPropertyEnum(), property.getAllCapsName());
+        property.getCodeGenerator().addMergeFromBuilder(body, metadata, "template", base);
+        body.addLine("  }");
       } else {
-        property.getCodeGenerator().addMergeFromBuilder(code, metadata, "template");
+        property.getCodeGenerator().addMergeFromBuilder(body, metadata, "template", base);
       }
     }
-    code.addLine("  return (%s) this;", metadata.getBuilder());
-    code.addLine("}");
+    code.add(body)
+        .addLine("  return (%s) this;", metadata.getBuilder())
+        .addLine("}");
   }
 
   private static void addClearMethod(SourceBuilder code, Metadata metadata) {

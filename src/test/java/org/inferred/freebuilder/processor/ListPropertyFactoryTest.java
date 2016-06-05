@@ -61,8 +61,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
     .with(new Processor())
     .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-    .with(new TestBuilder()
-        .addLine("com.example.DataType value = new com.example.DataType.Builder().build();")
+    .with(testBuilder()
+        .addLine("DataType value = new DataType.Builder().build();")
         .addLine("assertThat(value.getItems()).isEmpty();")
         .build())
     .runTest();
@@ -73,8 +73,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\")")
             .addLine("    .addItems(\"two\")")
             .addLine("    .build();")
@@ -89,8 +89,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("new DataType.Builder()")
             .addLine("    .addItems((String) null);")
             .build())
         .runTest();
@@ -101,8 +101,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\", \"two\")")
             .addLine("    .build();")
             .addLine("assertThat(value.getItems()).containsExactly(\"one\", \"two\").inOrder();")
@@ -116,8 +116,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("new DataType.Builder()")
             .addLine("    .addItems(\"one\", null);")
             .build())
         .runTest();
@@ -128,8 +128,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addAllItems(%s.of(\"one\", \"two\"))", ImmutableList.class)
             .addLine("    .build();")
             .addLine("assertThat(value.getItems()).containsExactly(\"one\", \"two\").inOrder();")
@@ -142,8 +142,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addAllItems(new %s(\"one\", \"two\"))", DodgySingleIterable.class)
             .addLine("    .build();")
             .addLine("assertThat(value.getItems()).containsExactly(\"one\", \"two\").inOrder();")
@@ -174,9 +174,24 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\", \"two\")")
+            .addLine("    .clearItems()")
+            .addLine("    .addItems(\"three\", \"four\")")
+            .addLine("    .build();")
+            .addLine("assertThat(value.getItems()).containsExactly(\"three\", \"four\").inOrder();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void testClear_emptyList() {
+    behaviorTester
+        .with(new Processor())
+        .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .clearItems()")
             .addLine("    .addItems(\"three\", \"four\")")
             .addLine("    .build();")
@@ -190,8 +205,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType.Builder builder = new com.example.DataType.Builder();")
+        .with(testBuilder()
+            .addLine("DataType.Builder builder = new DataType.Builder();")
             .addLine("%s<String> itemsView = builder.getItems();", List.class)
             .addLine("assertThat(itemsView).isEmpty();")
             .addLine("builder.addItems(\"one\", \"two\");")
@@ -210,8 +225,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType.Builder builder = new com.example.DataType.Builder();")
+        .with(testBuilder()
+            .addLine("DataType.Builder builder = new DataType.Builder();")
             .addLine("%s<String> itemsView = builder.getItems();", List.class)
             .addLine("itemsView.add(\"something\");")
             .build())
@@ -223,11 +238,11 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = com.example.DataType.builder()")
+        .with(testBuilder()
+            .addLine("DataType value = DataType.builder()")
             .addLine("    .addItems(\"one\", \"two\")")
             .addLine("    .build();")
-            .addLine("com.example.DataType.Builder builder = com.example.DataType.builder()")
+            .addLine("DataType.Builder builder = DataType.builder()")
             .addLine("    .mergeFrom(value);")
             .addLine("assertThat(value.getItems()).containsExactly(\"one\", \"two\").inOrder();")
             .build())
@@ -239,10 +254,10 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType.Builder template = com.example.DataType.builder()")
+        .with(testBuilder()
+            .addLine("DataType.Builder template = DataType.builder()")
             .addLine("    .addItems(\"one\", \"two\");")
-            .addLine("com.example.DataType.Builder builder = com.example.DataType.builder()")
+            .addLine("DataType.Builder builder = DataType.builder()")
             .addLine("    .mergeFrom(template);")
             .addLine("assertThat(builder.getItems()).containsExactly(\"one\", \"two\").inOrder();")
             .build())
@@ -254,8 +269,8 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\", \"two\")")
             .addLine("    .clear()")
             .addLine("    .addItems(\"three\", \"four\")")
@@ -283,8 +298,8 @@ public class ListPropertyFactoryTest {
             .addLine("  }")
             .addLine("}")
             .build())
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = com.example.DataType.builder(\"one\", \"two\")")
+        .with(testBuilder()
+            .addLine("DataType value = DataType.builder(\"one\", \"two\")")
             .addLine("    .clear()")
             .addLine("    .addItems(\"three\", \"four\")")
             .addLine("    .build();")
@@ -298,26 +313,77 @@ public class ListPropertyFactoryTest {
     behaviorTester
         .with(new Processor())
         .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
-        .with(new TestBuilder()
+        .with(testBuilder()
             .addLine("new %s()", EqualsTester.class)
             .addLine("    .addEqualityGroup(")
-            .addLine("        com.example.DataType.builder().build(),")
-            .addLine("        com.example.DataType.builder().build())")
+            .addLine("        DataType.builder().build(),")
+            .addLine("        DataType.builder().build())")
             .addLine("    .addEqualityGroup(")
-            .addLine("        com.example.DataType.builder()")
+            .addLine("        DataType.builder()")
             .addLine("            .addItems(\"one\", \"two\")")
             .addLine("            .build(),")
-            .addLine("        com.example.DataType.builder()")
+            .addLine("        DataType.builder()")
             .addLine("            .addItems(\"one\", \"two\")")
             .addLine("            .build())")
             .addLine("    .addEqualityGroup(")
-            .addLine("        com.example.DataType.builder()")
+            .addLine("        DataType.builder()")
             .addLine("            .addItems(\"one\")")
             .addLine("            .build(),")
-            .addLine("        com.example.DataType.builder()")
+            .addLine("        DataType.builder()")
             .addLine("            .addItems(\"one\")")
             .addLine("            .build())")
             .addLine("    .testEquals();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void testInstanceReuse() {
+    behaviorTester
+        .with(new Processor())
+        .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .addItems(\"one\", \"two\")")
+            .addLine("    .build();")
+            .addLine("DataType copy = DataType.Builder.from(value).build();")
+            .addLine("assertThat(value.getItems()).isSameAs(copy.getItems());")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void testPropertyClearAfterMergeFromValue() {
+    behaviorTester
+        .with(new Processor())
+        .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .addItems(\"one\", \"two\")")
+            .addLine("    .build();")
+            .addLine("DataType copy = DataType.Builder")
+            .addLine("    .from(value)")
+            .addLine("    .clearItems()")
+            .addLine("    .build();")
+            .addLine("assertThat(copy.getItems()).isEmpty();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void testBuilderClearAfterMergeFromValue() {
+    behaviorTester
+        .with(new Processor())
+        .with(LIST_PROPERTY_AUTO_BUILT_TYPE)
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .addItems(\"one\", \"two\")")
+            .addLine("    .build();")
+            .addLine("DataType copy = DataType.Builder")
+            .addLine("    .from(value)")
+            .addLine("    .clear()")
+            .addLine("    .build();")
+            .addLine("assertThat(copy.getItems()).isEmpty();")
             .build())
         .runTest();
   }
@@ -333,13 +399,10 @@ public class ListPropertyFactoryTest {
             .addLine("  public abstract %s<%s> getItems();", ImmutableList.class, String.class)
             .addLine("")
             .addLine("  public static class Builder extends DataType_Builder {}")
-            .addLine("  public static Builder builder() {")
-            .addLine("    return new Builder();")
-            .addLine("  }")
             .addLine("}")
             .build())
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\")")
             .addLine("    .addItems(\"two\")")
             .addLine("    .build();")
@@ -363,13 +426,10 @@ public class ListPropertyFactoryTest {
             .addLine("      return this;")
             .addLine("    }")
             .addLine("  }")
-            .addLine("  public static Builder builder() {")
-            .addLine("    return new Builder();")
-            .addLine("  }")
             .addLine("}")
             .build())
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"zero\")")
             .addLine("    .addItems(\"one\", \"two\")")
             .addLine("    .addAllItems(%s.of(\"three\", \"four\"))", ImmutableList.class)
@@ -394,13 +454,10 @@ public class ListPropertyFactoryTest {
             .addLine("      return this;")
             .addLine("    }")
             .addLine("  }")
-            .addLine("  public static Builder builder() {")
-            .addLine("    return new Builder();")
-            .addLine("  }")
             .addLine("}")
             .build())
-        .with(new TestBuilder()
-            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(0)")
             .addLine("    .addItems(1, 2)")
             .addLine("    .addAllItems(%s.of(3, 4))", ImmutableList.class)
@@ -426,8 +483,7 @@ public class ListPropertyFactoryTest {
             .addLine("  class Builder extends DataType_Builder {}")
             .addLine("}")
             .build())
-        .with(new TestBuilder()
-            .addImport("com.example.DataType")
+        .with(testBuilder()
             .addLine("DataType value = new DataType.Builder()")
             .addLine("    .addItems(\"one\")")
             .addLine("    .addItems(\"two\")")
@@ -438,5 +494,9 @@ public class ListPropertyFactoryTest {
             .addLine("assertThat(clone.getItems()).containsExactly(\"one\", \"two\").inOrder();")
             .build())
         .runTest();
+  }
+
+  private static TestBuilder testBuilder() {
+    return new TestBuilder().addImport("com.example.DataType");
   }
 }

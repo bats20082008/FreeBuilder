@@ -32,6 +32,7 @@ import static org.inferred.freebuilder.processor.util.StaticExcerpt.Type.METHOD;
 import static org.inferred.freebuilder.processor.util.feature.FunctionPackage.FUNCTION_PACKAGE;
 import static org.inferred.freebuilder.processor.util.feature.GuavaLibrary.GUAVA;
 import static org.inferred.freebuilder.processor.util.feature.SourceLevel.SOURCE_LEVEL;
+import static org.inferred.freebuilder.processor.util.feature.SourceLevel.diamondOperator;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -104,11 +105,12 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      code.addLine("private final %1$s<%2$s> %3$s = new %1$s<%4$s>();",
+      code.feature(SOURCE_LEVEL);
+      code.addLine("private final %1$s<%2$s> %3$s = new %1$s%4$s();",
           LinkedHashSet.class,
           elementType,
           property.getName(),
-          code.feature(SOURCE_LEVEL).supportsDiamondOperator() ? "" : elementType);
+          diamondOperator(elementType));
     }
 
     @Override
@@ -304,7 +306,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
-    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder) {
+    public void addMergeFromBuilder(SourceBuilder code, Metadata metadata, String builder, Excerpt base) {
       code.addLine("%s(((%s) %s).%s);",
           addAllMethod(property),
           metadata.getGeneratedBuilder(),
@@ -337,6 +339,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addTo(SourceBuilder code) {
       if (!code.feature(GUAVA).isAvailable()) {
+        code.feature(SOURCE_LEVEL);
         code.addLine("")
             .addLine("private static <E> %1$s<E> immutableSet(%1$s<E> elements) {",
                 Set.class, Class.class)
@@ -346,11 +349,8 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("  case 1:")
             .addLine("    return %s.singleton(elements.iterator().next());", Collections.class)
             .addLine("  default:")
-            .add("    return %s.unmodifiableSet(new %s<", Collections.class, LinkedHashSet.class);
-        if (!code.feature(SOURCE_LEVEL).supportsDiamondOperator()) {
-          code.add("E");
-        }
-        code.add(">(elements));\n")
+            .addLine("    return %s.unmodifiableSet(new %s%s(elements));",
+                Collections.class, LinkedHashSet.class, diamondOperator("E"))
             .addLine("  }")
             .addLine("}");
       }

@@ -17,6 +17,7 @@ package org.inferred.freebuilder.processor.util.feature;
 
 import com.google.common.base.Optional;
 
+import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.QualifiedName;
 import org.inferred.freebuilder.processor.util.SourceBuilder;
 
@@ -67,7 +68,16 @@ public enum SourceLevel implements Feature<SourceLevel> {
     }
   }
 
-  public boolean supportsDiamondOperator() {
-    return this.compareTo(JAVA_7) >= 0;
+  public static Excerpt diamondOperator(final Object type) {
+    return new Excerpt() {
+      @Override
+      public void addTo(SourceBuilder source) {
+        if (source.feature(SOURCE_LEVEL).compareTo(JAVA_7) >= 0) {
+          source.add("<>");
+        } else {
+          source.add("<%s>", type);
+        }
+      }
+    };
   }
 }
